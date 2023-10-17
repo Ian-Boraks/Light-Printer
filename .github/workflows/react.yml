@@ -1,0 +1,41 @@
+name: react-build-deploy
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - website/**
+      
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - run : cd ./website && npm i
+      shell: bash
+    - run : cd ./website && npm ci
+      shell: bash
+    - run : cd ./website && npm run build
+      shell: bash
+    - run : git config user.name github-actions
+      shell: bash
+    - run : git config user.email github-actions@github.com
+      shell: bash
+    - run : cd ./website && git --work-tree dist add --all
+    - run : touch .nojekyll
+      shell: bash
+    - run : git commit -m "Automatic Build and Deploy run by GitHub Actions"
+      shell: bash
+    - run : git push origin HEAD:gh-pages --force
+      shell: bash
