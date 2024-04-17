@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoBLE.h>
 #include "image.h"
 #include "imageArrays.h"
 
@@ -66,6 +67,7 @@ int loop()
 
         else if (printButton == 1)
         {
+            // FIXME: This is not the correct way to to do this ;)
             int xMapped = map(x, topLeft[0], bottomRight[0], 0, img1.getWidth());
             int yMapped = map(y, topLeft[1], bottomRight[1], 0, img1.getHeight());
 

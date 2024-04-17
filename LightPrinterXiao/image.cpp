@@ -1,5 +1,4 @@
 #include "image.h"
-#include "images.h"
 #include <algorithm>
 
 image::image(int *imageArray, int width, int height)
