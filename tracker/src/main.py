@@ -7,6 +7,11 @@ import cv2
 import imutils
 import time
 
+import serial
+
+
+serialPort = serial.Serial(port = "/dev/ttyUSB0", baudrate=460800)
+
 class TrackerStatus(Enum):
     TRACKING = 1
     LOST = 2
@@ -36,8 +41,8 @@ def openCVSetup() -> [VideoStream, dict]:
 
 def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
     # define the lower and upper boundaries of the "green"
-    colorLower = (130, 0, 250)
-    colorUpper = (255, 255, 255)
+    colorLower = (0, 0, 225)
+    colorUpper = (255, 14, 255)
 
     frame = vs.read()
     frame = frame[1] if args.get("video", False) else frame
@@ -50,8 +55,8 @@ def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
     mask = cv2.inRange(hsv, colorLower, colorUpper)
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
+    # mask = cv2.erode(mask, None, iterations=2)
+    # mask = cv2.dilate(mask, None, iterations=2)
 
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE)
@@ -62,14 +67,18 @@ def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
         c = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
         M = cv2.moments(c)
-        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+        try:
+            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+        except ZeroDivisionError:
+            center = None
+            radius = 0
 
         if radius > 2:
             cv2.circle(frame, (int(x), int(y)), int(radius),
                 (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-    cv2.imshow("Frame", frame)
+    cv2.imshow("Frame", mask)
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("q"):
@@ -91,7 +100,9 @@ while cv2.getWindowProperty('Frame', 0) >= 0:
     if status == TrackerStatus.STOPPED:
         break
     elif status == TrackerStatus.TRACKING:
+        position = 'X{:0=4}Y{:0=4}'.format(position[0], position[1])
         print(position)
+        serialPort.write(position.encode())
     elif status == TrackerStatus.LOST:
         print("Lost")
 
