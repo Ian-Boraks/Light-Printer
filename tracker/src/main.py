@@ -36,8 +36,8 @@ def openCVSetup() -> [VideoStream, dict]:
 
 def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
     # define the lower and upper boundaries of the "green"
-    colorLower = (19, 101, 0)
-    colorUpper = (176, 213, 255)
+    colorLower = (130, 0, 250)
+    colorUpper = (255, 255, 255)
 
     frame = vs.read()
     frame = frame[1] if args.get("video", False) else frame
