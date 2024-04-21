@@ -17,12 +17,10 @@ def open_camera() -> cv2.VideoCapture:
     # Define the GStreamer pipeline
     gst_pipeline = (
         "libcamerasrc ! "
-        "video/x-raw,format=RGB,width=640,height=480,framerate=30/1 ! "
-        "queue max-size-buffers=10, leaky=downstream ! "
-        "videoconvert ! "
-        "video/x-raw,format=BGR ! "
-        "queue leaky=downstream ! "
-        "appsink sync=false"
+        "video/x-raw,format=RGB,width=320,height=240,framerate=15/1 ! "
+        "tee name=t "
+        "t. ! queue ! videoconvert ! ximagesink sync=false "
+        "t. ! queue ! videoconvert ! videoscale ! video/x-raw,format=BGR ! appsink"
     )
     
     return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
@@ -58,7 +56,7 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
                        (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-    # cv2.imshow("Frame", mask)
+    cv2.imshow("Frame", mask)
     # key = cv2.waitKey(1) & 0xFF
 
     # if key == ord("q"):
@@ -72,8 +70,8 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
 def main():
     vs = open_camera()
 
-    # cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-    # cv2.resizeWindow('Frame', 600, 600)
+    cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Frame', 600, 600)
     
     time.sleep(1)
 
