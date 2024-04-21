@@ -55,7 +55,7 @@ def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
                        (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-    cv2.imshow("Frame", mask)
+    # cv2.imshow("Frame", mask)
 
     if center:
         return [TrackerStatus.TRACKING, center]
@@ -65,10 +65,10 @@ def main():
     camera = open_camera()
     # camera.start_preview(Preview.QTGL)
 
-    cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('Frame', 600, 600)
+    # cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow('Frame', 600, 600)
     
-    time.sleep(1)
+    # time.sleep(1)
 
     while True:
         frame = get_frame(camera)
