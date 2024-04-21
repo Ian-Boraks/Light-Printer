@@ -18,9 +18,9 @@ def open_camera() -> cv2.VideoCapture:
     gst_pipeline = (
         "libcamerasrc ! "
         "video/x-raw,format=RGB,width=320,height=240,framerate=15/1 ! "
-        "tee name=t "
-        "t. ! queue ! videoconvert ! ximagesink sync=false "
-        "t. ! queue ! videoconvert ! videoscale ! video/x-raw,format=BGR ! appsink"
+        "videoconvert ! "
+        "video/x-raw,format=BGR ! "
+        "appsink drop=true sync=false"
     )
     
     return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
@@ -30,7 +30,7 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
     colorUpper = (255, 14, 255)
 
     ret, frame = vs.read()
-    if not ret:
+    if not frame:
         print("Failed to read frame")
         time.sleep(.5)
         return [TrackerStatus.LOST, None]
