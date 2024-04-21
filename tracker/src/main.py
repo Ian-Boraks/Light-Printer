@@ -34,7 +34,9 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
     ret, frame = vs.read()
     if not ret:
         print("Failed to read frame")
-        return [TrackerStatus.STOPPED, None]
+        time.sleep(.5)
+        return [TrackerStatus.LOST, None]
+        # return [TrackerStatus.STOPPED, None]
 
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
