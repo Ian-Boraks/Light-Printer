@@ -68,7 +68,12 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
     return [TrackerStatus.LOST, None]
 
 def main():
+    print(cv2.getBuildInformation())
+
     vs = open_camera()
+
+    if (not vs.isOpened()):
+        print('Camera not opened')
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
