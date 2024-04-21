@@ -16,16 +16,12 @@ class TrackerStatus(Enum):
 def open_camera() -> cv2.VideoCapture:
     # Define the GStreamer pipeline
     gst_pipeline = (
-        "nvarguscamerasrc ! "
-        "video/x-raw(memory:NVMM), "
-        "width=(int)1280, height=(int)720, "
-        "format=(string)NV12, framerate=(fraction)60/1 ! "
-        "nvvidconv flip-method=2 ! "
-        "video/x-raw, width=(int)640, height=(int)480, format=(string)BGRx ! "
+        "libcamerasrc ! "
+        "video/x-raw,format=YUV2,width=640,height=480,framerate=30/1 ! "
         "videoconvert ! "
-        "video/x-raw, format=(string)BGR ! appsink"
+        "video/x-raw,format=BGR ! appsink"
     )
-
+    
     return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
 
 def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
@@ -72,8 +68,6 @@ def main():
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
-
-    time.sleep(2)
 
     while True:
         status, position = get_position(vs)
