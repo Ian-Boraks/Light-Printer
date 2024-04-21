@@ -18,8 +18,11 @@ def open_camera() -> cv2.VideoCapture:
     gst_pipeline = (
         "libcamerasrc ! "
         "video/x-raw,format=RGB,width=640,height=480,framerate=30/1 ! "
-        "videoconvert ! videoscale ! "
-        "video/x-raw,format=BGR ! appsink"
+        "queue max-size-buffers=10, leaky=downstream ! "
+        "videoconvert ! "
+        "video/x-raw,format=BGR ! "
+        "queue leaky=downstream ! "
+        "appsink sync=false"
     )
     
     return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
