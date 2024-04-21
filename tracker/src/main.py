@@ -1,9 +1,6 @@
 from collections import deque
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 from enum import Enum
 import numpy as np
-import argparse
 import cv2
 import imutils
 import time
@@ -16,27 +13,28 @@ class TrackerStatus(Enum):
     LOST = 2
     STOPPED = 3
 
-def setup_camera() -> [PiCamera, PiRGBArray, dict]:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-b", "--buffer", type=int, default=64,
-                    help="max buffer size")
-    args = vars(ap.parse_args())
+def open_camera() -> cv2.VideoCapture:
+    # Define the GStreamer pipeline
+    gst_pipeline = (
+        "nvarguscamerasrc ! "
+        "video/x-raw(memory:NVMM), "
+        "width=(int)1280, height=(int)720, "
+        "format=(string)NV12, framerate=(fraction)60/1 ! "
+        "nvvidconv flip-method=2 ! "
+        "video/x-raw, width=(int)640, height=(int)480, format=(string)BGRx ! "
+        "videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink"
+    )
 
-    camera = PiCamera()
-    camera.resolution = (640, 480)
-    camera.framerate = 32
-    rawCapture = PiRGBArray(camera, size=(640, 480))
+    return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
 
-    time.sleep(2.0)  # allow the camera to warmup
-
-    return [camera, rawCapture, args]
-
-def get_position(camera: PiCamera, rawCapture: PiRGBArray, args: dict) -> [TrackerStatus, [float, float]]:
+def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
     colorLower = (0, 0, 225)
     colorUpper = (255, 14, 255)
 
-    camera.capture(rawCapture, format="bgr")
-    frame = rawCapture.array
+    ret, frame = vs.read()
+    if not ret:
+        return [TrackerStatus.STOPPED, None]
 
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
@@ -60,7 +58,6 @@ def get_position(camera: PiCamera, rawCapture: PiRGBArray, args: dict) -> [Track
 
     cv2.imshow("Frame", mask)
     key = cv2.waitKey(1) & 0xFF
-    rawCapture.truncate(0)  # clear the stream in preparation for the next frame
 
     if key == ord("q"):
         return [TrackerStatus.STOPPED, None]
@@ -69,13 +66,13 @@ def get_position(camera: PiCamera, rawCapture: PiRGBArray, args: dict) -> [Track
     return [TrackerStatus.LOST, None]
 
 def main():
-    camera, rawCapture, args = setup_camera()
+    vs = open_camera()
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
 
     while True:
-        status, position = get_position(camera, rawCapture, args)
+        status, position = get_position(vs)
         if status == TrackerStatus.STOPPED:
             break
         elif status == TrackerStatus.TRACKING:
@@ -86,6 +83,7 @@ def main():
             print("Lost")
         time.sleep(0.1)
 
+    vs.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
