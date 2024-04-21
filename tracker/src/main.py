@@ -58,7 +58,7 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
                        (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-    cv2.imshow("Frame", mask)
+    # cv2.imshow("Frame", mask)
     # key = cv2.waitKey(1) & 0xFF
 
     # if key == ord("q"):
@@ -72,8 +72,8 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
 def main():
     vs = open_camera()
 
-    cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('Frame', 600, 600)
+    # cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow('Frame', 600, 600)
     
     time.sleep(1)
 
