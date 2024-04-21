@@ -63,7 +63,7 @@ def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
 
 def main():
     camera = open_camera()
-    camera.start_preview(Preview.QTGL)
+    # camera.start_preview(Preview.QTGL)
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
