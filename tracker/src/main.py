@@ -30,6 +30,7 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
 
     ret, frame = vs.read()
     if not ret:
+        print("Failed to read frame")
         return [TrackerStatus.STOPPED, None]
 
     frame = imutils.resize(frame, width=600)
@@ -68,6 +69,8 @@ def main():
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
+    
+    time.sleep(1)
 
     while True:
         status, position = get_position(vs)
