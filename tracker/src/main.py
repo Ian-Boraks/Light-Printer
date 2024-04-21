@@ -1,65 +1,49 @@
 from collections import deque
-from imutils.video import VideoStream
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 from enum import Enum
 import numpy as np
 import argparse
 import cv2
 import imutils
 import time
-
 import serial
 
-
-serialPort = serial.Serial(port = "/dev/ttyUSB0", baudrate=460800)
+serialPort = serial.Serial(port="/dev/ttyUSB0", baudrate=460800)
 
 class TrackerStatus(Enum):
     TRACKING = 1
     LOST = 2
     STOPPED = 3
 
-def openCVSetup() -> [VideoStream, dict]:
+def setup_camera() -> [PiCamera, PiRGBArray, dict]:
     ap = argparse.ArgumentParser()
-    ap.add_argument("-v", "--video",
-        help="path to the (optional) video file")
     ap.add_argument("-b", "--buffer", type=int, default=64,
-        help="max buffer size")
+                    help="max buffer size")
     args = vars(ap.parse_args())
 
-    # if a video path was not supplied, grab the reference
-    if not args.get("video", False):
-        vs = VideoStream(src=0).start()
-    else:
-        vs = cv2.VideoCapture(args["video"])
+    camera = PiCamera()
+    camera.resolution = (640, 480)
+    camera.framerate = 32
+    rawCapture = PiRGBArray(camera, size=(640, 480))
 
-    time.sleep(2.0)
+    time.sleep(2.0)  # allow the camera to warmup
 
-    cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('Frame', 600, 600)
+    return [camera, rawCapture, args]
 
-    return [vs, args]
-
-
-def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
-    # define the lower and upper boundaries of the "green"
+def get_position(camera: PiCamera, rawCapture: PiRGBArray, args: dict) -> [TrackerStatus, [float, float]]:
     colorLower = (0, 0, 225)
     colorUpper = (255, 14, 255)
 
-    frame = vs.read()
-    frame = frame[1] if args.get("video", False) else frame
-
-    if frame is None:
-        return [TrackerStatus.STOPPED, None]
+    camera.capture(rawCapture, format="bgr")
+    frame = rawCapture.array
 
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
     mask = cv2.inRange(hsv, colorLower, colorUpper)
-    # mask = cv2.erode(mask, None, iterations=2)
-    # mask = cv2.dilate(mask, None, iterations=2)
-
-    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-        cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     center = None
 
@@ -67,45 +51,42 @@ def getPosition(vs:VideoStream, args:dict) -> [TrackerStatus, [float, float]]:
         c = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
         M = cv2.moments(c)
-        try:
-            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-        except ZeroDivisionError:
-            center = None
-            radius = 0
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])) if M["m00"] else None
 
         if radius > 2:
             cv2.circle(frame, (int(x), int(y)), int(radius),
-                (0, 255, 255), 2)
+                       (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
     cv2.imshow("Frame", mask)
     key = cv2.waitKey(1) & 0xFF
+    rawCapture.truncate(0)  # clear the stream in preparation for the next frame
 
     if key == ord("q"):
         return [TrackerStatus.STOPPED, None]
-    elif center is not None:
+    elif center:
         return [TrackerStatus.TRACKING, center]
-    
     return [TrackerStatus.LOST, None]
-    
 
-setup = openCVSetup()
-vs = setup[0]
-args = setup[1]
+def main():
+    camera, rawCapture, args = setup_camera()
 
-while cv2.getWindowProperty('Frame', 0) >= 0:
-    
-    status, position = getPosition(vs, args)
+    cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Frame', 600, 600)
 
-    if status == TrackerStatus.STOPPED:
-        break
-    elif status == TrackerStatus.TRACKING:
-        position = 'X{:0=4}Y{:0=4}'.format(position[0], position[1])
-        print(position)
-        serialPort.write(position.encode())
-    elif status == TrackerStatus.LOST:
-        print("Lost")
+    while True:
+        status, position = get_position(camera, rawCapture, args)
+        if status == TrackerStatus.STOPPED:
+            break
+        elif status == TrackerStatus.TRACKING:
+            position_str = 'X{:0=4}Y{:0=4}'.format(position[0], position[1])
+            print(position_str)
+            serialPort.write(position_str.encode())
+        elif status == TrackerStatus.LOST:
+            print("Lost")
+        time.sleep(0.1)
 
-    time.sleep(0.1)
+    cv2.destroyAllWindows()
 
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
