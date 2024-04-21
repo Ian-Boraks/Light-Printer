@@ -73,6 +73,8 @@ def main():
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
 
+    time.sleep(2)
+
     while True:
         status, position = get_position(vs)
         if status == TrackerStatus.STOPPED:
