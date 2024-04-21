@@ -5,6 +5,7 @@ import cv2
 import imutils
 import time
 import serial
+from picamera2 import Picamera2, Preview
 
 serialPort = serial.Serial(port="/dev/ttyUSB0", baudrate=460800)
 
@@ -13,20 +14,26 @@ class TrackerStatus(Enum):
     LOST = 2
     STOPPED = 3
 
-def open_camera() -> cv2.VideoCapture:
-    # Define the GStreamer pipeline
-    return cv2.VideoCapture(0)
+def open_camera() -> Picamera2:
+    camera = Picamera2()
+    camera_config = camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)})
+    camera.configure(camera_config)
+    camera.start()
+    return camera
 
-def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
+def get_frame(camera: Picamera2) -> np.ndarray:
+    # Get the frame from the camera
+    frame = camera.capture_array()
+    return frame
+
+def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
     colorLower = (0, 0, 225)
     colorUpper = (255, 14, 255)
 
-    ret, frame = vs.read()
-    if not ret:
+    if frame is None:
         print("Failed to read frame")
         time.sleep(.5)
         return [TrackerStatus.LOST, None]
-        # return [TrackerStatus.STOPPED, None]
 
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
@@ -49,23 +56,15 @@ def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
     cv2.imshow("Frame", mask)
-    # key = cv2.waitKey(1) & 0xFF
-
-    # if key == ord("q"):
-    #     return [TrackerStatus.STOPPED, None]
-    # elif 
 
     if center:
         return [TrackerStatus.TRACKING, center]
     return [TrackerStatus.LOST, None]
 
 def main():
-    print(cv2.getBuildInformation())
-
-    vs = open_camera()
-
-    if (not vs.isOpened()):
-        print('Camera not opened')
+    camera = open_camera()
+    preview = Preview()
+    preview.start(camera)
 
     cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('Frame', 600, 600)
@@ -73,7 +72,8 @@ def main():
     time.sleep(1)
 
     while True:
-        status, position = get_position(vs)
+        frame = get_frame(camera)
+        status, position = get_position(frame)
         if status == TrackerStatus.STOPPED:
             break
         elif status == TrackerStatus.TRACKING:
@@ -84,7 +84,7 @@ def main():
             print("Lost")
         time.sleep(0.1)
 
-    vs.release()
+    camera.stop()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
