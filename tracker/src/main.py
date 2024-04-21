@@ -15,15 +15,7 @@ class TrackerStatus(Enum):
 
 def open_camera() -> cv2.VideoCapture:
     # Define the GStreamer pipeline
-    gst_pipeline = (
-        "libcamerasrc ! "
-        "video/x-raw,format=RGB,width=320,height=240,framerate=15/1 ! "
-        "tee name=t "
-        "t. ! queue ! videoconvert ! ximagesink sync=false "
-        "t. ! queue leaky=downstream max-size-buffers=10 max-size-time=0 max-size-bytes=0 ! videoconvert ! videoscale ! video/x-raw,format=BGR ! appsink drop=true sync=false"
-    )
-    
-    return cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+    return cv2.VideoCapture(0)
 
 def get_position(vs: cv2.VideoCapture) -> [TrackerStatus, [float, float]]:
     colorLower = (0, 0, 225)
