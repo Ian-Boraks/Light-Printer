@@ -104,28 +104,70 @@ from picamera2 import Picamera2
 `cv2` is the main workhorse for image processing. `imutils` is used to resize the image. `picamera2` is used to capture the image using the NoIR camera. Then, the position data is sent to the Seeduino XIAO using the `serial` library over ELRS airport.
 
 ### Seeduino XIAO
+
 The Seeduino XIAO is responsible for controlling the NeoPixel LED. The Seeduino XIAO receives the position data from the Raspberry Pi Zero W2 using the ELRS receiver. The Seeduino XIAO then controls the NeoPixel LED based on the position data.
 
-#### Custom `image` Holder
-```h
-class image
-{
-public:
-    explicit image(uint32_t *imageArray, int width, int height);
+#### How to load the image
 
-    void getSize(int *width, int *height);
-    void getPixelValue(int x, int y, int *r, int *g, int *b, int *a);
+To get the image into the Seeduino XIAO, we need to convert the image into a format that can be read by the Seeduino XIAO. The image is converted into a 2D array of RGBA values. We do this using [Piskel](https://www.piskelapp.com/), a free online tool for creating pixel art.
 
-    int getWidth() { return _width; }
-    int getHeight() { return _height; }
+The output is as follows:
 
-private:
-    uint32_t *_imageArray;
-    int _width;
-    int _height;
-};
+<details>
+  <summary>
+    Piskle Exported Data
+  </summary>
+
+```c
+#include <stdint.h>
+
+#define NEW_PISKEL_FRAME_COUNT 1
+#define NEW_PISKEL_FRAME_WIDTH 32
+#define NEW_PISKEL_FRAME_HEIGHT 32
+
+/* Piskel data for "New Piskel" */
+
+uint32_t new_piskel_data[1][1024] = {{0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, ..., 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff, 0xff0000ff}};
 ```
 
+</details>
+
+#### How to use the image
+
+We can use this exported file (first convert it from .c to .h) and include it in our Seeduino XIAO code.
+
+```ino
+#include "New Piskel.h"
+#include "image.h"
+...
+image img1(new_piskel_data[0], NEW_PISKEL_FRAME_WIDTH, NEW_PISKEL_FRAME_HEIGHT);
+```
+
+We can then access all of the individual pixels using the `img1` object.
+
+```ino
+int x, y;
+int r, g, b, a;
+
+img1.getPixelValue(x, y, &r, &g, &b, &a);
+```
+
+This will give us the RGBA value of the pixel at position `x`, `y` using the following function:
+
+```cpp
+void image::getPixelValue(int x, int y, int *r, int *g, int *b, int *a)
+{
+    // Read the pixel at (x, y) and swap byte order from BGRA to RGBA
+    uint32_t pixel = __builtin_bswap32(_imageArray[x * _width + y]);
+
+    *r = (pixel >> 24) & 0xFF; // Extract the red component
+    *g = (pixel >> 16) & 0xFF; // Extract the green component
+    *b = (pixel >> 8) & 0xFF;  // Extract the blue component
+    *a = pixel & 0xFF;         // Extract the alpha component
+}
+```
+
+After we have the pixel data, we can then control the NeoPixel LED based on the pixel data.
 
 ## Demo
 

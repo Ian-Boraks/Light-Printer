@@ -29,7 +29,8 @@ image::image(uint32_t *imageArray, int width, int height)
  */
 void image::getPixelValue(int x, int y, int *r, int *g, int *b, int *a)
 {
-    uint32_t pixel = __builtin_bswap32(_imageArray[x * _width + y]); // Read the pixel at (x, y) and swap byte order from BGRA to RGBA
+    // Read the pixel at (x, y) and swap byte order from BGRA to RGBA
+    uint32_t pixel = __builtin_bswap32(_imageArray[x * _width + y]);
 
     *r = (pixel >> 24) & 0xFF; // Extract the red component
     *g = (pixel >> 16) & 0xFF; // Extract the green component
