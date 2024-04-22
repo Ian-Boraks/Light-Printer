@@ -2,7 +2,30 @@
 
 This is an expansion on the idea of a light painter. The idea is to create a device that can be used to create light paintings. The device will be able to move in the x and y directions and will be able to change the color of the light. The device will be controlled by a computer and will be able to create complex light paintings.
 
-## Components
+- [Light Printer](#light-printer)
+  - [Hardware Setup](#hardware-setup)
+    - [Components](#components)
+    - [Wiring](#wiring)
+      - [Seeduino XIAO](#seeduino-xiao)
+      - [Raspberry Pi Zero W2](#raspberry-pi-zero-w2)
+  - [Software Setup](#software-setup)
+    - [Control Flow Diagram](#control-flow-diagram)
+    - [Sequence Diagram](#sequence-diagram)
+    - [ELRS Airport](#elrs-airport)
+    - [Raspberry Pi Zero W2](#raspberry-pi-zero-w2-1)
+      - [Main Imports](#main-imports)
+    - [Seeduino XIAO](#seeduino-xiao-1)
+      - [How to load the image](#how-to-load-the-image)
+      - [How to use the image](#how-to-use-the-image)
+  - [Demo](#demo)
+
+## Hardware Setup
+
+The hardware setup is fairly simple. The IR camera is connected to the Raspberry Pi Zero W2. The IR emitter is connected to the Seeduino XIAO. The NeoPixel LED is connected to the Seeduino XIAO. The ELRS receiver is connected to the Seeduino XIAO. The ELRS transmitter is connected to the Raspberry Pi Zero W2.
+
+The ELRS receiver and transmitter are used to communicate between the Raspberry Pi Zero W2 and the Seeduino XIAO. The IR camera is used to detect the position of the device. The IR emitter is used to illuminate the area around the device. The NeoPixel LED is used to create the light painting.
+
+### Components
 
 - Raspberry Pi Zero W2
 - Seeduino XIAO
@@ -12,21 +35,15 @@ This is an expansion on the idea of a light painter. The idea is to create a dev
 - ELRS Receiver
 - ELRS Transmitter
 
-## Hardware Setup
+### Wiring
 
-The hardware setup is fairly simple. The IR camera is connected to the Raspberry Pi Zero W2. The IR emitter is connected to the Seeduino XIAO. The NeoPixel LED is connected to the Seeduino XIAO. The ELRS receiver is connected to the Seeduino XIAO. The ELRS transmitter is connected to the Raspberry Pi Zero W2.
-
-The ELRS receiver and transmitter are used to communicate between the Raspberry Pi Zero W2 and the Seeduino XIAO. The IR camera is used to detect the position of the device. The IR emitter is used to illuminate the area around the device. The NeoPixel LED is used to create the light painting.
-
-## Wiring
-
-### Seeduino XIAO
+#### Seeduino XIAO
 
 The schematic for the hardware setup is as follows:
 
 ![Schematic of XIAO Connections](image-1.png)
 
-### Raspberry Pi Zero W2
+#### Raspberry Pi Zero W2
 
 The schematic for the hardware setup is as follows:
 
