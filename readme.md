@@ -1,5 +1,7 @@
 # Light Printer
 
+Designed By: Ian Boraks and Spencer Yahn
+
 This is an expansion on the idea of a light painter. The idea is to create a device that can be used to create light paintings. The device will be able to move in the x and y directions and will be able to change the color of the light. The device will be controlled by a computer and will be able to create complex light paintings.
 
 [Demo Video](https://youtu.be/YISogReZkR8)
