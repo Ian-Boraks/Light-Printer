@@ -37,7 +37,7 @@ void setup()
   Serial.begin(115200);
 
   light->begin();
-  light->setBrightness(50);
+  light->setBrightness(100);
   light->clear();
   light->show();
   delay(100);

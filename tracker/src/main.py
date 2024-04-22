@@ -59,8 +59,8 @@ def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
     Returns:
         A tuple with the tracking status and the object's central coordinates (x, y).
     """
-    colorLower = (0, 0, 82)
-    colorUpper = (255, 255, 255)
+    colorLower = (0, 0, 60)
+    colorUpper = (210, 115, 255)
 
     if frame is None:
         time.sleep(0.5)
