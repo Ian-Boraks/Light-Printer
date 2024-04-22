@@ -8,6 +8,7 @@ This is an expansion on the idea of a light painter. The idea is to create a dev
     - [Wiring](#wiring)
       - [Seeduino XIAO](#seeduino-xiao)
       - [Raspberry Pi Zero W2](#raspberry-pi-zero-w2)
+    - [Photos](#photos)
   - [Software Setup](#software-setup)
     - [Control Flow Diagram](#control-flow-diagram)
     - [Sequence Diagram](#sequence-diagram)
@@ -18,6 +19,7 @@ This is an expansion on the idea of a light painter. The idea is to create a dev
       - [How to load the image](#how-to-load-the-image)
       - [How to use the image](#how-to-use-the-image)
   - [Demo](#demo)
+  - [Conclusion](#conclusion)
 
 ## Hardware Setup
 
@@ -41,7 +43,7 @@ The ELRS receiver and transmitter are used to communicate between the Raspberry 
 
 The schematic for the hardware setup is as follows:
 
-![Schematic of XIAO Connections](image-1.png)
+![Schematic of XIAO Connections](./img_readme/image-1.png)
 
 #### Raspberry Pi Zero W2
 
@@ -52,6 +54,11 @@ graph LR;
     A[IR Camera] --> D[Raspberry Pi Zero W2];
     D[Raspberry Pi Zero W2]--> C[ELRS Transmitter];
 ```
+
+### Photos
+
+![Back Of Device](./img_readme/image-7.png)
+![Front Of Device](./img_readme/image-8.png)
 
 ## Software Setup
 
@@ -188,8 +195,72 @@ After we have the pixel data, we can then control the NeoPixel LED based on the 
 
 ## Demo
 
-Inputted Image:
-![Blue Square in a Green Square in a Red Square](image.png)
+Below are some examples of the light paintings created using the light printer. The first example is a square in a square in a square. The second example is the Microsoft logo.
 
-Outputted Light Painting:
-![Lines generally representing the image above](image-2.png)
+<details>
+<summary>
+    Square in a Square in a Square (Input)
+</summary>
+
+![Blue Square in a Green Square in a Red Square](./img_readme/image.png)
+
+</details>
+
+<details>
+<summary>
+    Square in a Square in a Square (Output)
+</summary>
+
+![Lines generally representing the image above](./img_readme/image-2.png)
+
+</details>
+
+<details>
+<summary>
+    Square in a Square in a Square (Overlaid)
+</summary>
+
+![Overlaid Images](./img_readme/image-3.png)
+
+</details>
+
+---
+
+<details>
+<summary>
+    Microsoft (Input)
+</summary>
+
+![Microsoft](./img_readme/image-4.png)
+
+</details>
+
+<details>
+<summary>
+    Microsoft (Output)
+</summary>
+
+![Lines generally representing the image above](./img_readme/image-5.png)
+
+</details>
+
+<details>
+<summary>
+    Microsoft (Overlaid)
+</summary>
+
+![Overlaid Images](./img_readme/image-6.png)
+
+</details>
+
+---
+
+Sadly, this isn't the best representation of the image. But it's a start. The colors don't switch as fast as we would like and the thin light element means that a lot of lines are needed to display an image. But this is a good start to creating light paintings using the light printer.
+
+## Conclusion
+
+Even though the results of this first iteration are not perfect, it is a good start. The light printer is able to create light paintings using the NeoPixel LED. The light printer is able to move in the x and y directions and is able to change the color of the light. The light printer is controlled by a computer and is able to create complex light paintings.
+
+This hits all of our initial expectations and is a good start to creating a light printer. The next steps would be to improve the speed at which the colors change and to improve the resolution of the light printer. This could be done by using a faster processor and a faster image recognition algorithm.
+
+The other limitation is how we track the position of the device. The current implementation is not very accurate and could be improved. This might be improved with GPS or other tracking methods.
