@@ -3,7 +3,7 @@
 #include "image.h"
 #include "imageArrays.h"
 
-image img1(image1, 50, 32);
+image img1(image1, 32, 32);
 
 const int actionButton = 10;
 const int printButton = 9;
