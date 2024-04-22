@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include "image.h"      // Custom image class for handling image operations
-#include "New Piskel.h" // Image data arrays
+#include "imageArray.h" // Image data arrays
 
 // Create an image object from image data with a resolution of 32x32
 image img1(new_piskel_data[0], NEW_PISKEL_FRAME_WIDTH, NEW_PISKEL_FRAME_HEIGHT);
