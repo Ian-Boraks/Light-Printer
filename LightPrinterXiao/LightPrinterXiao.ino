@@ -3,8 +3,7 @@
 #include "image.h"      // Custom image class for handling image operations
 #include "imageArray.h" // Image data arrays
 
-// Create an image object from image data with a resolution of 32x32
-image img1(georgia_tech_logo_2021_cropped_data[0], GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_WIDTH, GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_HEIGHT);
+image img1(georgia_tech_logo_2021_cropped_data, GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_WIDTH, GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_HEIGHT);
 
 // Button pins
 const int actionButton = 10; // Button for action (e.g., setting corners)
