@@ -95,6 +95,8 @@ def main():
     """
     camera = open_camera()
 
+    print("Starting the tracking process...")
+
     while True:
         frame = get_frame(camera)
         status, position = get_position(frame)
