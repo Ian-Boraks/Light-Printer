@@ -1,7 +1,8 @@
 #include "image.h"
+#include <stdint.h>
 #include <algorithm>
 
-image::image(int *imageArray, int width, int height)
+image::image(uint32_t *imageArray, int width, int height)
 {
     _imageArray = imageArray;
     _width = width;
@@ -10,7 +11,7 @@ image::image(int *imageArray, int width, int height)
 
 void image::getPixelValue(int x, int y, int *r, int *g, int *b, int *a)
 {
-    int pixel = _imageArray[x * _width + y];
+    uint32_t pixel = __builtin_bswap32(_imageArray[x * _width + y]);
 
     *r = (pixel >> 24) & 0xFF;
     *g = (pixel >> 16) & 0xFF;
