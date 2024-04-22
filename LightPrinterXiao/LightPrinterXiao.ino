@@ -20,11 +20,12 @@ int yMin = INT_MAX;
 int xMax = INT_MIN;
 int yMax = INT_MIN;
 
-int x, y;        // Variables to store the current x and y coordinates
-char xHolder[5]; // Buffer to hold the x-coordinate string
-char yHolder[5]; // Buffer to hold the y-coordinate string
+// Variables to store the current x and y coordinates
+int x, y;
+char xHolder[5];
+char yHolder[5];
 
-bool idle = false; // State to check if the device is idle
+bool idle = false;
 
 // Initialize the NeoPixel strip
 Adafruit_NeoPixel *light = new Adafruit_NeoPixel(1, 5, NEO_GRB + NEO_KHZ800);
@@ -69,7 +70,6 @@ void loop()
     y = atoi(yHolder); // Convert y-coordinate string to integer
   }
 
-  // Check if action button is pressed
   if (digitalRead(actionButton) == LOW)
   {
     // Update minimum and maximum coordinates
@@ -84,9 +84,9 @@ void loop()
     bottomRight[0] = xMax;
     bottomRight[1] = yMin;
   }
-  else if (digitalRead(printButton) == LOW) // Check if print button is pressed
+  else if (digitalRead(printButton) == LOW)
   {
-    idle = false; // Reset the idle state
+    idle = false;
 
     // Map x and y to image coordinates
     int xMapped = map(x, topLeft[0], bottomRight[0], 0, img1.getWidth());
