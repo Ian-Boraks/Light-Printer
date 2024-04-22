@@ -104,9 +104,9 @@ def main():
             break
         elif status == TrackerStatus.TRACKING:
             position_str = "X{:0=4}Y{:0=4}".format(position[0], position[1])
-            print(position_str)
             serialPort.write(position_str.encode())
         elif status == TrackerStatus.LOST:
+            print("Object lost...")
             pass
 
     camera.stop()

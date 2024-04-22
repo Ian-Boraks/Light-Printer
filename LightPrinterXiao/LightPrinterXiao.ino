@@ -37,7 +37,7 @@ void setup()
   Serial.begin(115200);
 
   light->begin();
-  light->setBrightness(100);
+  light->setBrightness(50);
   light->clear();
   light->show();
   delay(100);
@@ -89,7 +89,7 @@ void loop()
     bottomRight[0] = xMax;
     bottomRight[1] = yMin;
 
-    Serial.println("DEST");
+    // Serial.println("DEST");
   }
   else if (digitalRead(printButton) == LOW)
   {
@@ -108,15 +108,18 @@ void loop()
     light->setPixelColor(0, light->Color(r, g, b));       // Set color of the single pixel
     light->show();                                        // Update the strip to apply changes
 
-    Serial.printf("X%dY%d", x, y); // Send color values to the ESP32
-    Serial.println(" at COLORS");
+    // Serial.printf("X%dY%d", x, y); // Send color values to the ESP32
+    // Serial.println(" at COLORS");
   }
   else if (!idle) // If currently not idle
   {
     light->clear(); // Clears the strip
     light->show();  // Update the strip
-    delay(100);
+    delay(200);
     
     idle = true;    // Set the state to idle
+  } else {
+    light->clear();
+    delay(200);
   }
 }
