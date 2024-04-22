@@ -1,55 +1,38 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "image.h"
-#include "imageArrays.h"
+#include "image.h"       // Custom image class for handling image operations
+#include "imageArrays.h" // Image data arrays
 
+// Create an image object from image data with a resolution of 32x32
 image img1(image1, 32, 32);
 
-const int actionButton = 10;
-const int printButton = 9;
+// Button pins
+const int actionButton = 10; // Button for action (e.g., setting corners)
+const int printButton = 9;   // Button for printing (e.g., displaying colors)
 
+// Coordinates for top-left and bottom-right corners
 int topLeft[2] = {0, 100};
 int bottomRight[2] = {100, 0};
 
+// Variables to track the extremes of coordinates
 int xMin = INT_MAX;
 int yMin = INT_MAX;
 int xMax = INT_MIN;
 int yMax = INT_MIN;
 
-int x, y;
-char xHolder[5];
-char yHolder[5];
+int x, y;        // Variables to store the current x and y coordinates
+char xHolder[5]; // Buffer to hold the x-coordinate string
+char yHolder[5]; // Buffer to hold the y-coordinate string
 
-bool idle = false;
+bool idle = false; // State to check if the device is idle
 
+// Initialize the NeoPixel strip
 Adafruit_NeoPixel *light = new Adafruit_NeoPixel(1, 5, NEO_GRB + NEO_KHZ800);
-
-void cornerCorrection(int *_topLeft, int *_bottomRight)
-{
-  int temp;
-
-  if (_topLeft[0] > _bottomRight[0])
-  {
-    temp = _topLeft[0];
-    _topLeft[0] = _bottomRight[0];
-    _bottomRight[0] = temp;
-  }
-
-  if (_topLeft[1] > _bottomRight[1])
-  {
-    temp = _topLeft[1];
-    _topLeft[1] = _bottomRight[1];
-    _bottomRight[1] = temp;
-  }
-}
 
 void setup()
 {
   Serial1.begin(420000);
   Serial1.setTimeout(10);
-  // Serial.begin(115200);
-
-  digitalWrite(LED_BUILTIN, HIGH);
 
   light->begin();
   light->setBrightness(50);
@@ -62,66 +45,66 @@ void setup()
 
 void loop()
 {
-  // delay(10);
   light->clear();
-  char numberHolder[10] = {NULL};
+  char numberHolder[10] = {NULL}; // Buffer to hold incoming Serial data
 
+  // Read from Serial1 if available
   while (Serial1.available() > 0)
   {
     Serial1.readBytes(numberHolder, 10);
 
+    // Validate the incoming data format
     if (numberHolder[0] != 'X' && numberHolder[5] != 'Y')
       break;
 
-    memcpy(&xHolder, &numberHolder[1], 4);
-    memcpy(&yHolder, &numberHolder[6], 4);
+    // DATA is in the format "X1234Y5678"
+    // Extract the x and y coordinates from the data
+    memcpy(xHolder, &numberHolder[1], 4);
+    memcpy(yHolder, &numberHolder[6], 4);
 
-    yHolder[5] = '\0';
-    xHolder[5] = '\0';
+    xHolder[4] = '\0'; // Null-terminate the string
+    yHolder[4] = '\0'; // Null-terminate the string
 
-    x = atoi(xHolder);
-    y = atoi(yHolder);
+    x = atoi(xHolder); // Convert x-coordinate string to integer
+    y = atoi(yHolder); // Convert y-coordinate string to integer
   }
 
-  if (digitalRead(actionButton) == 0)
+  // Check if action button is pressed
+  if (digitalRead(actionButton) == LOW)
   {
-    if (x < xMin)
-      xMin = x;
-    if (y < yMin)
-      yMin = y;
-    if (x > xMax)
-      xMax = x;
-    if (y > yMax)
-      yMax = y;
+    // Update minimum and maximum coordinates
+    xMin = min(xMin, x);
+    yMin = min(yMin, y);
+    xMax = max(xMax, x);
+    yMax = max(yMax, y);
 
+    // Set the corrected corner points
     topLeft[0] = xMin;
     topLeft[1] = yMax;
     bottomRight[0] = xMax;
     bottomRight[1] = yMin;
-
-    // Serial.printf("TLx%i TLy%i BRx%i BRl%i \n", topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
   }
-  else if (digitalRead(printButton) == 0)
+  else if (digitalRead(printButton) == LOW) // Check if print button is pressed
   {
-    idle = false;
+    idle = false; // Reset the idle state
 
+    // Map x and y to image coordinates
     int xMapped = map(x, topLeft[0], bottomRight[0], 0, img1.getWidth());
     int yMapped = map(y, topLeft[1], bottomRight[1], 0, img1.getHeight());
 
+    // Check if mapped coordinates are within bounds
     if (xMapped < 0 || xMapped >= img1.getWidth() || yMapped < 0 || yMapped >= img1.getHeight())
-      return;
+      return; // Exit if out of bounds
 
-    int r, g, b, a;
-    img1.getPixelValue(xMapped, yMapped, &r, &g, &b, &a);
-    light->setPixelColor(0, light->Color(r, g, b));
-    light->show();
-
-    // Serial.printf("%R%i G%i B%i A%i \n", r, g, b, a);
+    int r, g, b, a;                                       // Variables to hold color values
+    img1.getPixelValue(xMapped, yMapped, &r, &g, &b, &a); // Retrieve color values
+    light->setPixelColor(0, light->Color(r, g, b));       // Set color of the single pixel
+    light->show();                                        // Update the strip to apply changes
   }
-  else if (!idle)
+  else if (!idle) // If currently not idle
   {
-    light->fill();
-    light->show();
-    idle = true;
+    light->fill(); // Fill the strip (turn all pixels to the set color)
+    light->show(); // Update the strip
+    idle = true;   // Set the state to idle
   }
 }
