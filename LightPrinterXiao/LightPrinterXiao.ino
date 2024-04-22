@@ -32,7 +32,7 @@ Adafruit_NeoPixel *light = new Adafruit_NeoPixel(1, 5, NEO_GRB + NEO_KHZ800);
 void setup()
 {
   Serial1.begin(420000);
-  Serial1.setTimeout(10);
+  // Serial1.setTimeout(10);
 
   Serial.begin(115200);
 
@@ -40,6 +40,7 @@ void setup()
   light->setBrightness(50);
   light->clear();
   light->show();
+  delay(100);
 
   pinMode(actionButton, INPUT_PULLUP);
   pinMode(printButton, INPUT_PULLUP);
