@@ -27,8 +27,8 @@ def get_frame(camera: Picamera2) -> np.ndarray:
     return frame
 
 def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
-    colorLower = (0, 0, 225)
-    colorUpper = (255, 14, 255)
+    colorLower = (0, 0, 82)
+    colorUpper = (255, 255, 255)
 
     if frame is None:
         print("Failed to read frame")
