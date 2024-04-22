@@ -3,15 +3,11 @@
 #include "image.h"      // Custom image class for handling image operations
 #include "imageArray.h" // Image data arrays
 
-image img1(georgia_tech_logo_2021_cropped_data, GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_WIDTH, GEORGIA_TECH_LOGO_2021_CROPPED_FRAME_HEIGHT);
+image img1(microsoft_logo, microsoft_logo_WIDTH, microsoft_logo_HEIGHT);
 
 // Button pins
 const int actionButton = 10; // Button for action (e.g., setting corners)
 const int printButton = 9;   // Button for printing (e.g., displaying colors)
-
-// Coordinates for top-left and bottom-right corners
-int topLeft[2] = {0, 100};
-int bottomRight[2] = {100, 0};
 
 // Variables to track the extremes of coordinates
 int xMin = INT_MAX;
@@ -34,13 +30,13 @@ void setup()
   Serial1.begin(420000);
   // Serial1.setTimeout(10);
 
-  Serial.begin(115200);
+  // Serial.begin(115200);
 
   light->begin();
   light->setBrightness(50);
   light->clear();
   light->show();
-  delay(100);
+  delay(500);
 
   pinMode(actionButton, INPUT_PULLUP);
   pinMode(printButton, INPUT_PULLUP);
@@ -83,12 +79,6 @@ void loop()
     xMax = max(xMax, x);
     yMax = max(yMax, y);
 
-    // Set the corrected corner points
-    topLeft[0] = xMin;
-    topLeft[1] = yMax;
-    bottomRight[0] = xMax;
-    bottomRight[1] = yMin;
-
     // Serial.println("DEST");
   }
   else if (digitalRead(printButton) == LOW)
@@ -96,8 +86,8 @@ void loop()
     idle = false;
 
     // Map x and y to image coordinates
-    int xMapped = map(x, topLeft[0], bottomRight[0], 0, img1.getWidth());
-    int yMapped = map(y, topLeft[1], bottomRight[1], 0, img1.getHeight());
+    int xMapped = map(x, xMin, xMax, 0, img1.getWidth());
+    int yMapped = map(y, yMin, yMax, 0, img1.getHeight());
 
     // Check if mapped coordinates are within bounds
     if (xMapped < 0 || xMapped >= img1.getWidth() || yMapped < 0 || yMapped >= img1.getHeight())
@@ -116,9 +106,11 @@ void loop()
     light->clear(); // Clears the strip
     light->show();  // Update the strip
     delay(200);
-    
-    idle = true;    // Set the state to idle
-  } else {
+
+    idle = true; // Set the state to idle
+  }
+  else
+  {
     light->clear();
     delay(200);
   }
