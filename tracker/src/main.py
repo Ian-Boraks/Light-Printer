@@ -63,7 +63,6 @@ def get_position(frame: np.ndarray) -> [TrackerStatus, [float, float]]:
     colorUpper = (255, 255, 255)
 
     if frame is None:
-        print("Failed to read frame")
         time.sleep(0.5)
         return [TrackerStatus.LOST, None]
 
@@ -103,10 +102,9 @@ def main():
             break
         elif status == TrackerStatus.TRACKING:
             position_str = "X{:0=4}Y{:0=4}".format(position[0], position[1])
-            print(position_str)
             serialPort.write(position_str.encode())
         elif status == TrackerStatus.LOST:
-            print("Lost")
+            pass
 
     camera.stop()
     cv2.destroyAllWindows()
