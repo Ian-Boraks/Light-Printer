@@ -34,6 +34,8 @@ void setup()
   Serial1.begin(420000);
   Serial1.setTimeout(10);
 
+  Serial.begin(115200);
+
   light->begin();
   light->setBrightness(50);
   light->clear();
@@ -55,7 +57,11 @@ void loop()
 
     // Validate the incoming data format
     if (numberHolder[0] != 'X' && numberHolder[5] != 'Y')
-      break;
+    {
+      light->clear(); // Clear the strip if data is invalid
+      light->show();  // Update the strip
+      return;
+    }
 
     // DATA is in the format "X1234Y5678"
     // Extract the x and y coordinates from the data
@@ -82,6 +88,8 @@ void loop()
     topLeft[1] = yMax;
     bottomRight[0] = xMax;
     bottomRight[1] = yMin;
+
+    Serial.println("DEST");
   }
   else if (digitalRead(printButton) == LOW)
   {
@@ -99,11 +107,15 @@ void loop()
     img1.getPixelValue(xMapped, yMapped, &r, &g, &b, &a); // Retrieve color values
     light->setPixelColor(0, light->Color(r, g, b));       // Set color of the single pixel
     light->show();                                        // Update the strip to apply changes
+
+    Serial.printf("X%dY%d", x, y); // Send color values to the ESP32
+    Serial.println(" at COLORS");
   }
   else if (!idle) // If currently not idle
   {
-    light->fill(); // Fill the strip (turn all pixels to the set color)
-    light->show(); // Update the strip
-    idle = true;   // Set the state to idle
+    light->clear(); // Clears the strip
+    light->show();  // Update the strip
+    idle = true;    // Set the state to idle
+    delay(100);
   }
 }
