@@ -48,7 +48,6 @@ void setup()
 
 void loop()
 {
-  light->clear();
   char numberHolder[10] = {NULL}; // Buffer to hold incoming Serial data
 
   // Read from Serial1 if available
@@ -116,7 +115,8 @@ void loop()
   {
     light->clear(); // Clears the strip
     light->show();  // Update the strip
-    idle = true;    // Set the state to idle
     delay(100);
+    
+    idle = true;    // Set the state to idle
   }
 }
