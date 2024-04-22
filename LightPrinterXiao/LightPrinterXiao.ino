@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "image.h"       // Custom image class for handling image operations
-#include "imageArrays.h" // Image data arrays
+#include "image.h"      // Custom image class for handling image operations
+#include "New Piskel.h" // Image data arrays
 
 // Create an image object from image data with a resolution of 32x32
-image img1(image1, 32, 32);
+image img1(new_piskel_data[0], NEW_PISKEL_FRAME_WIDTH, NEW_PISKEL_FRAME_HEIGHT);
 
 // Button pins
 const int actionButton = 10; // Button for action (e.g., setting corners)

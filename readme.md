@@ -106,7 +106,7 @@ from picamera2 import Picamera2
 ### Seeduino XIAO
 The Seeduino XIAO is responsible for controlling the NeoPixel LED. The Seeduino XIAO receives the position data from the Raspberry Pi Zero W2 using the ELRS receiver. The Seeduino XIAO then controls the NeoPixel LED based on the position data.
 
-#### Custom `image` Library
+#### Custom `image` Holder
 ```h
 class image
 {
